@@ -30,25 +30,41 @@ if (!program.directory) {
   program.directory = '';
 }
 
-// CI variable is automatically set on CircleCI
-if (process.env.CI) {
-  var fileService = storage.ConnectFileshareWithSas();
+// code below exports download as well as makes it a method of the azureFilestore object
+// this allows running this script stand alone from the command line and importing the code
+// in another module.
+(function(){
+  var azureFilestore = {};
+  exports.download = azureFilestore.download = function(directory, file, callback) {
 
-  storage.FileExists(fileService, program.directory, program.file, function(err, found) {
-  if (found) {
-    console.log("Downloading file from Azure Storage...");
+    if (process.env.CI) {
+      var fileService = storage.ConnectFileshareWithSas();
 
-    // signature: getFileToLocalFile(share, directory, file, localFileName, [options], callback)
-    // empty string ('') refers to base directory
-    fileService.getFileToLocalFile(process.env.AZURE_SHARE, program.directory, program.file, program.file, function(error, result, response) {
-      if (!error) {
-        console.log("File %s successfully downloaded from Azure storage", program.file);
-      }
-      else {
-        console.log("Error downloading file from Azure storage");
-        console.log(error);
-      }
+      storage.FileExists(fileService, directory, file, function(err, found) {
+        if (found) {
+          console.log("Downloading file from Azure Storage...");
+
+          // signature: getFileToLocalFile(share, directory, file, localFileName, [options], callback)
+          // empty string ('') refers to base directory
+          fileService.getFileToLocalFile(process.env.AZURE_SHARE, directory, file, file, function(error, result, response) {
+            if (!error) {
+              console.log("File %s successfully downloaded from Azure storage", file);
+              return callback(null, file);
+            }
+            else {
+              console.log("Error downloading file from Azure storage");
+              console.log(error);
+              return callback(error, null);
+            }
+          });
+        }
       });
-    }
-  });
-}
+    }    
+  }
+
+  // module.parent returns true only when this module is required by another.
+  if (!module.parent) {
+    azureFilestore.download(program.directory, program.file, program.file);
+  }
+})();
+
