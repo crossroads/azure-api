@@ -1,0 +1,28 @@
+{
+  "name": "azure-api",
+  "version": "0.0.1",
+  "description": "A command line tool to interface with Microsoft Azure services",
+  "bin": {
+    "azure-filestore": "./app/azure-filestore.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crossroads/azure-api.git"
+  },
+  "keywords": [
+    "npm"
+  ],
+  "author": "Crossroads Foundation Limited",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/crossroads/azure-api/issues"
+  },
+  "homepage": "https://github.com/crossroads/azure-api#readme",
+  "dependencies": {
+    "azure-storage": "^1.3.1",
+    "commander": "^2.9.0"
+  }
+}
