@@ -35,4 +35,5 @@ Tests depend on the following packages
 * [chai](https://www.npmjs.com/package/chai) : Assertion library
 * [sinon](https://www.npmjs.com/package/sinon) : Mocking/Stubbing library
 * [sinon-chai](https://www.npmjs.com/package/sinon-chai) : Assertions for the sinon framework
-* [proxyquire](https://www.npmjs.com/package/proxyquire): Allows replacing modules with other modules for ‘require’ inside a test subject
+* [proxyquire](https://www.npmjs.com/package/proxyquire): Allows replacing modules with other modules for `require` inside a test subject
+* [istanbul](https://github.com/gotwarlost/istanbul): code coverage
