@@ -16,26 +16,19 @@ var testDir = 'dev';
 
 describe('azure-filestore-delete', function() {
 
-  // mock azure result object
-  function Result(exists) {
-    this.exists = exists;
-  }
-
   // possible responses from azure
   var no_err = null;
   var err = "error";
   var response_ok = "success";
   var response_not_ok = "fail";
-  var resource_found = new Result(true);
-  var resource_not_found = new Result(false);
+  var resource_found = true;
+  var resource_not_found = false;
 
   // Scenario 1: no error, file exists
-  var azureStub = utils.GetAzureStub(no_err, resource_found, response_ok);
- 
+  var storageStub = utils.GetStorageUtilsStub(no_err, resource_found, response_ok);
+
   // Execute the test subject by using proxyquire to load our script, passing in dependencies
-  var storage = proxyquire('../app/storage-utils.js', { 'azure-storage': azureStub });
-  var fileService = storage.ConnectFileshareWithSas();
-  var azureFilestore = require('../app/azure-filestore-delete.js');
+  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { 'storage-utils': storageStub });
 
   // delete successful
   describe('no error, file exists', function() {
@@ -50,21 +43,33 @@ describe('azure-filestore-delete', function() {
   });
 
   // Scenario 2: no error, file does not exist
-  var azureStub = utils.GetAzureStub(err, false, response_ok);
- 
-  // Execute the test subject by using proxyquire to load our script, passing in dependencies
-  var storage = proxyquire('../app/storage-utils.js', { 'azure-storage': azureStub });
-  var fileService = storage.ConnectFileshareWithSas();
-  var azureFilestore = require('../app/azure-filestore-delete.js');
+  var storageStub = utils.GetStorageUtilsStub(no_err, resource_not_found, response_ok);
+  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { 'storage-utils': storageStub });
 
   // file not found
   describe('no error, file does not exist', function() {
     azureFilestore.delete(testDir, testFile, function(error, flag) {
-      it.skip('file not found', function() {
+      it('file not found', function() {
         expect(flag).to.equal(false);
       });
       it('no error', function() {
         expect(error).to.equal(null);
+      });
+    });
+  });
+
+  // Scenario 3: error
+  var storageStub = utils.GetStorageUtilsStub(err, resource_found, response_not_ok);
+  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { 'storage-utils': storageStub });
+
+  // file not found
+  describe('error deleting file', function() {
+    azureFilestore.delete(testDir, testFile, function(error, flag) {
+      it('flag not set', function() {
+        expect(flag).to.equal(null);
+      });
+      it('error', function() {
+        expect(error).to.equal(error);
       });
     });
   });

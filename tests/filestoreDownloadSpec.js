@@ -16,26 +16,19 @@ var testDir = 'dev';
 
 describe('azure-filestore-download', function() {
 
-  // mock azure result object
-  function Result(exists) {
-    this.exists = exists;
-  }
-
   // possible responses from azure
   var no_err = null;
   var err = "error";
   var response_ok = "success";
   var response_not_ok = "fail";
-  var resource_found = new Result(true);
-  var resource_not_found = new Result(false);
+  var resource_found = true;
+  var resource_not_found = false;
 
   // Scenario 1: no error
-  var azureStub = utils.GetAzureStub(no_err, resource_found, response_ok);
+  var storageStub = utils.GetStorageUtilsStub(no_err, resource_found, response_ok);
   
   // Execute the test subject by using proxyquire to load our script, passing in dependencies
-  var storage = proxyquire('../app/storage-utils.js', { 'azure-storage': azureStub });
-  var fileService = storage.ConnectFileshareWithSas();
-  var azureFilestore = require('../app/azure-filestore-download.js');
+  var azureFilestore = proxyquire('../app/azure-filestore-download.js', { 'storage-utils': storageStub });
 
   // download successful
   describe('download successful', function() {
@@ -50,7 +43,19 @@ describe('azure-filestore-download', function() {
   });
 
   // Scenario 2: error
-  // cannot test this because of the file exists check that preceeds the download
-  // error is trapped there
+  var storageStub = utils.GetStorageUtilsStub(err, resource_found, response_not_ok);
+  var azureFilestore = proxyquire('../app/azure-filestore-download.js', { 'storage-utils': storageStub });
+
+  // download failed 
+  describe('download failed', function() {
+    azureFilestore.download(testDir, testFile, function(error, filename) {
+      it('file not downloaded', function() {
+        expect(filename).to.equal(null);
+      });
+      it('error', function() {
+        expect(error).to.equal(error);
+      });
+    });
+  });
 
 });
