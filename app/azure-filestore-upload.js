@@ -15,7 +15,7 @@
  *
  */
 
-var storage = require('storage-utils');
+var storage = require('./storage-utils');
 var fs = require('fs');
 var program = require('commander');
 

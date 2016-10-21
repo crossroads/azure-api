@@ -7,7 +7,7 @@
  *
  */
 
-var storage = require('storage-utils');
+var storage = require('./storage-utils');
 var program = require('commander');
 
 program

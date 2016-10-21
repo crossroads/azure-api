@@ -28,7 +28,7 @@ describe('azure-filestore-delete', function() {
   var storageStub = utils.GetStorageUtilsStub(no_err, resource_found, response_ok);
 
   // Execute the test subject by using proxyquire to load our script, passing in dependencies
-  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { './storage-utils': storageStub });
 
   // delete successful
   describe('no error, file exists', function() {
@@ -44,7 +44,7 @@ describe('azure-filestore-delete', function() {
 
   // Scenario 2: no error, file does not exist
   var storageStub = utils.GetStorageUtilsStub(no_err, resource_not_found, response_ok);
-  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { './storage-utils': storageStub });
 
   // file not found
   describe('no error, file does not exist', function() {
@@ -60,7 +60,7 @@ describe('azure-filestore-delete', function() {
 
   // Scenario 3: error
   var storageStub = utils.GetStorageUtilsStub(err, resource_found, response_not_ok);
-  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-delete.js', { './storage-utils': storageStub });
 
   // file not found
   describe('error deleting file', function() {

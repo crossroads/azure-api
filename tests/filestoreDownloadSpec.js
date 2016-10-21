@@ -28,7 +28,7 @@ describe('azure-filestore-download', function() {
   var storageStub = utils.GetStorageUtilsStub(no_err, resource_found, response_ok);
   
   // Execute the test subject by using proxyquire to load our script, passing in dependencies
-  var azureFilestore = proxyquire('../app/azure-filestore-download.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-download.js', { './storage-utils': storageStub });
 
   // download successful
   describe('download successful', function() {
@@ -44,7 +44,7 @@ describe('azure-filestore-download', function() {
 
   // Scenario 2: error
   var storageStub = utils.GetStorageUtilsStub(err, resource_found, response_not_ok);
-  var azureFilestore = proxyquire('../app/azure-filestore-download.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-download.js', { './storage-utils': storageStub });
 
   // download failed 
   describe('download failed', function() {

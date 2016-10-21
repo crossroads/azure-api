@@ -34,7 +34,7 @@ describe('azure-filestore-upload', function() {
   var storageStub = utils.GetStorageUtilsStub(no_err, resource_found, response_ok);
 
   // Execute the test subject by using proxyquire to load our script, passing in dependencies
-  var azureFilestore = proxyquire('../app/azure-filestore-upload.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-upload.js', { './storage-utils': storageStub });
 
   // upload successful
   describe('upload successful', function() {
@@ -50,7 +50,7 @@ describe('azure-filestore-upload', function() {
 
   // Scenario 2: error
   var storageStub = utils.GetStorageUtilsStub(err, resource_found, response_not_ok);
-  var azureFilestore = proxyquire('../app/azure-filestore-upload.js', { 'storage-utils': storageStub });
+  var azureFilestore = proxyquire('../app/azure-filestore-upload.js', { './storage-utils': storageStub });
 
   // upload failed
   describe('upload failed', function() {
