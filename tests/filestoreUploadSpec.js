@@ -13,6 +13,7 @@ chai.use(sinonChai);
 var utils = require('./test-utils');
 var testFile = 'test.txt';
 var testDir = 'dev';
+var missingFile = 'missing.txt';
 
 // create the test file
 var fs = require('fs');
@@ -29,6 +30,7 @@ describe('azure-filestore-upload', function() {
   var response_not_ok = "fail";
   var resource_found = true;
   var resource_not_found = false;
+  var local_resource_not_found = "not found";
 
   // Scenario 1: no error
   var storageStub = utils.GetStorageUtilsStub(no_err, resource_found, response_ok);
@@ -48,7 +50,19 @@ describe('azure-filestore-upload', function() {
     });
   });
 
-  // Scenario 2: error
+  // Scenario 2: missing file
+  describe('missing file', function() {
+    azureFilestore.upload(testDir, missingFile, missingFile, function(error, filename) {
+      it('file not uploaded', function() {
+        expect(filename).to.equal(missingFile);
+      });
+      it('not found', function() {
+        expect(error).to.equal(local_resource_not_found);
+      });
+    });
+  });
+
+  // Scenario 3: error
   var storageStub = utils.GetStorageUtilsStub(err, resource_found, response_not_ok);
   var azureFilestore = proxyquire('../app/azure-filestore-upload.js', { './storage-utils': storageStub });
 

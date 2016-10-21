@@ -64,7 +64,7 @@ if (!program.target) {
             fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, target, file, function(error, result, response) {
               if (!error) {
                 console.log("File %s successfully uploaded to Azure storage", file);
-                return callback(null, target);
+                return callback(null, file);
               }
               else {
                 console.log("Error uploading file to Azure storage");
@@ -76,7 +76,8 @@ if (!program.target) {
         });
       }
       else {
-        console.log("File %s not found", file);
+        console.log("Local file %s not found", file);
+        return callback("not found", file);
       }
     }
   }
@@ -84,7 +85,9 @@ if (!program.target) {
 
   // module.parent returns true only when this module is required by another.
   if (!module.parent) {
-    azureFilestore.upload(program.directory, program.file, program.file);
+    azureFilestore.upload(program.directory, program.file, program.file, function(result, filename) {
+      console.log("Invoked from command line");
+    });
   }
 })();
 

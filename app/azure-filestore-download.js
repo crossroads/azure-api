@@ -36,6 +36,8 @@ if (!program.directory) {
 (function(){
   var azureFilestore = {};
   exports.download = azureFilestore.download = function(directory, file, callback) {
+    var result = null;
+    var filename = null;
 
     if (process.env.CI) {
       var fileService = storage.ConnectFileshareWithSas();
@@ -49,22 +51,25 @@ if (!program.directory) {
           fileService.getFileToLocalFile(process.env.AZURE_SHARE, directory, file, file, function(error, result, response) {
             if (!error) {
               console.log("File %s successfully downloaded from Azure storage", file);
-              return callback(null, file);
+              filename = file;
             }
             else {
               console.log("Error downloading file from Azure storage");
               console.log(error);
-              return callback(error, null);
+              result = error
             }
           });
         }
       });
-    }    
+    }
+    return callback(result, filename);    
   }
 
   // module.parent returns true only when this module is required by another.
   if (!module.parent) {
-    azureFilestore.download(program.directory, program.file, program.file);
+    azureFilestore.download(program.directory, program.file, function(error, filename) {
+      console.log("Invoked from command line");
+    });
   }
 })();
 

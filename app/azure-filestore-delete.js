@@ -36,6 +36,8 @@ if (!program.directory) {
 (function(){
   var azureFilestore = {};
   exports.delete = azureFilestore.delete = function(directory, file, callback) {
+    var result = null;
+    var flag = null;
 
     if (process.env.CI) {
       var fileService = storage.ConnectFileshareWithSas();
@@ -47,26 +49,28 @@ if (!program.directory) {
         if (!error) {
           if (result) {
             console.log("File %s successfully deleted from Azure storage", file);
-            return callback(null, true);
+            flag = true;
           }
           else {
             console.log("File %s not found on Azure storage", file);
-            return callback(null, false);
+            flag = false;
           }
         }
         else {
           console.log("Error deleting file from Azure storage");
           console.log(error);
-          return callback(error, null);
+          result = error;
         }
       });
-
     }
+    return callback(result, flag);
   }
 
   // module.parent returns true only when this module is required by another.
   if (!module.parent) {
-    azureFilestore.delete(program.directory, program.file);
+    azureFilestore.delete(program.directory, program.file, function(error, flag) {
+      console.log("Invoked from command line");
+    });
   }
 })();
 
