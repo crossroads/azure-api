@@ -44,31 +44,50 @@ if (!program.target) {
   program.target = program.file;
 }
 
-// CI variable is automatically set on CircleCI
-if (process.env.CI) {
-  var fileService = storage.ConnectFileshareWithSas();
+// code below exports upload as well as makes it a method of the azureFilestore object
+// this allows running this script stand alone from the command line and importing the code
+// in another module.
+(function(){
+  var azureFilestore = {};
+  exports.upload = azureFilestore.upload = function(directory, target, file, callback) {
 
-  if (fs.existsSync(program.file)) {
-        storage.DirExists(fileService, program.directory, function(err, found) {
+    if (process.env.CI) {
+      var fileService = storage.ConnectFileshareWithSas();
+
+      if (fs.existsSync(file)) {
+        storage.DirExists(fileService, directory, function(err, found) {
           if (found) {
             console.log("Uploading file to Azure Storage...");
 
             // signature: createFileFromLocalFile(share, directory, file, localFile, options, callback)
             // file is overwritten if it exists
-            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, program.directory, program.target, program.file, function(error, result, response) {
+            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, target, file, function(error, result, response) {
               if (!error) {
-                console.log("File successfully uploaded to Azure storage");
+                console.log("File %s successfully uploaded to Azure storage", file);
+                return callback(null, file);
               }
               else {
                 console.log("Error uploading file to Azure storage");
                 console.log(error);
+                return callback(error, null);
               }
             });
           }
         });
       }
       else {
-        console.log("File %s not found", program.file);
+        console.log("Local file %s not found", file);
+        return callback("not found", file);
       }
+    }
+  }
 
-}
+
+  // module.parent returns true only when this module is required by another.
+  if (!module.parent) {
+    azureFilestore.upload(program.directory, program.file, program.file, function(result, filename) {
+      console.log("Invoked from command line");
+    });
+  }
+})();
+

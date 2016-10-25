@@ -30,25 +30,47 @@ if (!program.directory) {
   program.directory = '';
 }
 
-// CI variable is automatically set on CircleCI
-if (process.env.CI) {
-  var fileService = storage.ConnectFileshareWithSas();
+// code below exports delete as well as makes it a method of the azureFilestore object
+// this allows running this script stand alone from the command line and importing the code
+// in another module.
+(function(){
+  var azureFilestore = {};
+  exports.delete = azureFilestore.delete = function(directory, file, callback) {
+    var result = null;
+    var flag = null;
 
-  console.log("Deleting file from Azure Storage...");
+    if (process.env.CI) {
+      var fileService = storage.ConnectFileshareWithSas();
 
-  // signature: deleteFileIfExists(share, directory, file, [options], callback)
-  fileService.deleteFileIfExists(process.env.AZURE_SHARE, program.directory, program.file, function(error, result, response) {
-    if (!error) {
-      if (result) {
-        console.log("File %s successfully deleted from Azure storage", program.file);
-      }
-      else {
-        console.log("File %s not found on Azure storage", program.file);
-      }
+      console.log("Deleting file from Azure Storage...");
+
+      // signature: deleteFileIfExists(share, directory, file, [options], callback)
+      fileService.deleteFileIfExists(process.env.AZURE_SHARE, directory, file, function(error, result, response) {
+        if (!error) {
+          if (result) {
+            console.log("File %s successfully deleted from Azure storage", file);
+            flag = true;
+          }
+          else {
+            console.log("File %s not found on Azure storage", file);
+            flag = false;
+          }
+        }
+        else {
+          console.log("Error deleting file from Azure storage");
+          console.log(error);
+          result = error;
+        }
+      });
     }
-    else {
-      console.log("Error deleting file from Azure storage");
-      console.log(error);
-    }
-  });
-}
+    return callback(result, flag);
+  }
+
+  // module.parent returns true only when this module is required by another.
+  if (!module.parent) {
+    azureFilestore.delete(program.directory, program.file, function(error, flag) {
+      console.log("Invoked from command line");
+    });
+  }
+})();
+

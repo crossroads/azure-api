@@ -25,3 +25,15 @@ The utility requires the environment variables AZURE_HOST, AZURE_SHARE and AZURE
 Run `azure-filestore -h` for a list of available commands
 
 Run `azure-filestore help <sub-command>` for help with a specific sub-command
+
+## Running tests
+
+Run `npm test` to run unit test suite.
+
+Tests depend on the following packages
+* [mocha](https://www.npmjs.com/package/mocha) : Test runner
+* [chai](https://www.npmjs.com/package/chai) : Assertion library
+* [sinon](https://www.npmjs.com/package/sinon) : Mocking/Stubbing library
+* [sinon-chai](https://www.npmjs.com/package/sinon-chai) : Assertions for the sinon framework
+* [proxyquire](https://www.npmjs.com/package/proxyquire): Allows replacing modules with other modules for `require` inside a test subject
+* [istanbul](https://github.com/gotwarlost/istanbul): code coverage
