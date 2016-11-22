@@ -61,7 +61,7 @@ if (!program.target) {
 
             // signature: createFileFromLocalFile(share, directory, file, localFile, options, callback)
             // file is overwritten if it exists
-            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, target, file, function(error, result, response) {
+            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, file, target, function(error, result, response) {
               if (!error) {
                 console.log("File %s successfully uploaded to Azure storage", file);
                 return callback(null, file);
