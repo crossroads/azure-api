@@ -18,6 +18,7 @@
 var storage = require('./storage-utils');
 var fs = require('fs');
 var program = require('commander');
+var path = require('path');
 
 program
   .option('-d, --directory [directory]', 'upload directory, defaults to root')
@@ -41,7 +42,7 @@ if (!program.directory) {
 }
 
 if (!program.target) {
-  program.target = program.file;
+  program.target = path.basename(program.file);
 }
 
 // code below exports upload as well as makes it a method of the azureFilestore object
@@ -61,7 +62,7 @@ if (!program.target) {
 
             // signature: createFileFromLocalFile(share, directory, file, localFile, options, callback)
             // file is overwritten if it exists
-            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, file, target, function(error, result, response) {
+            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, target, file, function(error, result, response) {
               if (!error) {
                 console.log("File %s successfully uploaded to Azure storage", file);
                 return callback(null, file);

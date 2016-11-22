@@ -69,10 +69,10 @@ describe('azure-filestore-upload', function() {
   // upload failed
   describe('upload failed', function() {
     azureFilestore.upload(testDir, testFile, testFile, function(error, filename) {
-      it('file uploaded', function() {
+      it('file not uploaded', function() {
         expect(filename).to.equal(null);
       });
-      it('no error', function() {
+      it('error', function() {
         expect(error).to.equal(err);
       });
     });
