@@ -58,11 +58,14 @@ if (!program.target) {
       if (fs.existsSync(file)) {
         storage.DirExists(fileService, directory, function(err, found) {
           if (found) {
+            process.chdir(path.dirname(file));
+            console.log("Switched to the directory: %s", process.cwd() );
             console.log("Uploading file to Azure Storage...");
 
             // signature: createFileFromLocalFile(share, directory, file, localFile, options, callback)
             // file is overwritten if it exists
-            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, target, file, function(error, result, response) {
+            console.log("%s %s %s %s", process.env.AZURE_SHARE, directory, target, path.basename(file));
+            fileService.createFileFromLocalFile(process.env.AZURE_SHARE, directory, target, path.basename(file), function(error, result, response) {
               if (!error) {
                 console.log("File %s successfully uploaded to Azure storage", file);
                 return callback(null, file);
@@ -86,7 +89,7 @@ if (!program.target) {
 
   // module.parent returns true only when this module is required by another.
   if (!module.parent) {
-    azureFilestore.upload(program.directory, program.file, program.file, function(result, filename) {
+    azureFilestore.upload(program.directory, program.target, program.file, function(result, filename) {
       console.log("Invoked from command line");
     });
   }
